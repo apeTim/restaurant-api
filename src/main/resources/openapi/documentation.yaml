@@ -1,0 +1,321 @@
+openapi: "3.0.3"
+info:
+  title: "Application API"
+  description: "Application API"
+  version: "1.0.0"
+servers:
+  - url: "http://0.0.0.0:8080"
+paths:
+  /api/auth/register:
+    post:
+      summary: "Register a new user"
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterCredentials"
+      responses:
+        201:
+          description: "User created successfully"
+        400:
+            description: "Validation failed"
+
+  /api/positions/available:
+    get:
+      summary: "Get all available positions in a menu"
+      tags:
+        - positions
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Position"
+
+  /api/positions:
+    post:
+        summary: "Create new position in menu"
+        tags:
+          - positions
+        security:
+          - basicAuth: [ ]
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PositionDto"
+        responses:
+          201:
+            description: "Position created successfully"
+          400:
+            description: "Validation failed"
+
+  /api/positions/{id}:
+      put:
+        summary: "Update position in menu"
+        tags:
+          - positions
+        security:
+          - basicAuth: [ ]
+        parameters:
+          - in: path
+            name: id
+            schema:
+              type: integer
+              format: int64
+            required: true
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PositionDto"
+        responses:
+          200:
+            description: "Position updated successfully"
+          400:
+            description: "Validation failed"
+
+  /api/orders:
+    post:
+      summary: "Create new order"
+      tags:
+        - orders
+      security:
+        - basicAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderPositionsDto"
+      responses:
+        201:
+          description: "Position created successfully"
+        400:
+          description: "Validation failed"
+
+  /api/orders/my:
+    get:
+      summary: "List all active orders for current user"
+      tags:
+        - orders
+      security:
+        - basicAuth: [ ]
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Position"
+
+  /api/orders/{id}:
+      get:
+        summary: "Get order by id"
+        tags:
+          - orders
+        security:
+          - basicAuth: [ ]
+        parameters:
+          - in: path
+            name: id
+            schema:
+              type: integer
+              format: int64
+            required: true
+        responses:
+          200:
+            description: "Successful operation"
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/PositionDto"
+          400:
+            description: "Bad request"
+
+  /api/orders/{id}/add-positions:
+    post:
+      summary: "Add position to order"
+      tags:
+        - orders
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderPositionsDto"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Bad request"
+
+  /api/orders/{id}/cancel:
+      post:
+        summary: "Cancel order"
+        tags:
+          - orders
+        security:
+          - basicAuth: [ ]
+        parameters:
+          - in: path
+            name: id
+            schema:
+              type: integer
+              format: int64
+            required: true
+        responses:
+          200:
+            description: "Successful operation"
+          400:
+            description: "Bad request"
+
+  /api/orders/{id}/pay:
+    post:
+      summary: "Pay for the order"
+      tags:
+        - orders
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Bad request"
+
+components:
+  schemas:
+    RegisterCredentials:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
+        isAdmin:
+          type: "boolean"
+      required:
+        - username
+        - password
+        - isAdmin
+
+    Position:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        price:
+          type: "number"
+          format: "double"
+        amount:
+          type: "integer"
+          format: "int64"
+        difficulty:
+          type: "integer"
+          format: "int64"
+      required:
+        - id
+        - name
+        - description
+        - price
+        - amount
+        - difficulty
+
+    PositionDto:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        price:
+          type: "number"
+          format: "double"
+        amount:
+          type: "integer"
+          format: "int64"
+        difficulty:
+          type: "integer"
+          format: "int64"
+      required:
+        - name
+        - description
+        - price
+        - amount
+        - difficulty
+
+    Order:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        userId:
+          type: "integer"
+          format: "int64"
+        positions:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+        status:
+          type: "string"
+        createdTimestamp:
+          type: "integer"
+          format: "int64"
+      required:
+        - id
+        - userId
+        - positions
+        - status
+        - createdTimestamp
+
+    OrderPositionsDto:
+      type: "object"
+      properties:
+        positions:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      required:
+        - positions
+
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

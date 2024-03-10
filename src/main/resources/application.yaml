@@ -1,0 +1,12 @@
+ktor:
+    application:
+        modules:
+            - com.restaurant.ApplicationKt.module
+    deployment:
+        port: 8080
+db:
+    driver: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5432/db"
+    user: "user"
+    pass: "password"
+    pool: 3
